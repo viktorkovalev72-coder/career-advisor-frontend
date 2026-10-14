@@ -1,7 +1,7 @@
 {
   "name": "Карьерный консультант PRO",
   "short_name": "Карьера PRO",
-  "description": "Профессиональный поиск вакансий по безопасности и охране грузов",
+  "description": "Профессиональный поиск вакансий по 14 городам ПФО",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
