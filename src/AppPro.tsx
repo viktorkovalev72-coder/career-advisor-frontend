@@ -190,7 +190,7 @@ export default function AppPro() {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Tabs */}
-        <div className="flex gap-1 bg-white/5 rounded-xl p-1 border border-white/10 mb-4 sm:mb-6 overflow-x-auto scrollbar-hide">
+        <div className="flex flex-wrap sm:flex-nowrap gap-1 bg-white/5 rounded-xl p-1 border border-white/10 mb-4 sm:mb-6">
           {[
             { id: 'search', label: '🔍 Поиск', icon: Search },
             { id: 'results', label: `📋 Результаты (${vacancies.length})`, icon: FileText },
@@ -201,7 +201,7 @@ export default function AppPro() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 min-w-fit px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap cursor-pointer ${
+              className={`flex-1 px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all sm:whitespace-nowrap cursor-pointer text-center ${
                 activeTab === tab.id
                   ? 'bg-blue-600 text-white shadow-lg'
                   : 'text-blue-200 hover:text-white hover:bg-white/5'
