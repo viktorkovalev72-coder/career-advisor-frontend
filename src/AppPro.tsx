@@ -162,8 +162,25 @@ export default function AppPro() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
       {/* Header */}
-      <header className="border-b border-blue-200/30 backdrop-blur-sm bg-gradient-to-r from-blue-600 to-blue-700">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+      <header className="relative border-b border-blue-200/30 backdrop-blur-sm bg-gradient-to-r from-blue-600 to-blue-700 overflow-hidden">
+        {/* Брендовые треугольники Работа России */}
+        <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 opacity-20 pointer-events-none">
+          <svg viewBox="0 0 200 200" className="w-full h-full">
+            <polygon points="200,0 200,200 0,200" fill="#FF6B00" />
+          </svg>
+        </div>
+        <div className="absolute top-0 right-20 sm:right-32 w-20 h-20 sm:w-32 sm:h-32 opacity-15 pointer-events-none">
+          <svg viewBox="0 0 200 200" className="w-full h-full">
+            <polygon points="200,0 200,200 0,200" fill="#FFFFFF" />
+          </svg>
+        </div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-36 sm:h-36 opacity-15 pointer-events-none">
+          <svg viewBox="0 0 200 200" className="w-full h-full">
+            <polygon points="0,200 0,0 200,0" fill="#FF6B00" />
+          </svg>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="flex items-center">
             <div>
               <h1 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
