@@ -163,20 +163,16 @@ export default function AppPro() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
       {/* Header */}
       <header className="relative border-b border-blue-200/30 backdrop-blur-sm bg-gradient-to-r from-blue-600 to-blue-700 overflow-hidden">
-        {/* Брендовые треугольники Работа России */}
-        <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 opacity-20 pointer-events-none">
-          <svg viewBox="0 0 200 200" className="w-full h-full">
-            <polygon points="200,0 200,200 0,200" fill="#FF6B00" />
+        {/* Брендовые треугольники Работа России - направленные стрелки */}
+        <div className="absolute top-0 right-0 flex items-center gap-1 opacity-30 pointer-events-none">
+          <svg width="60" height="80" viewBox="0 0 60 80" className="sm:w-20 sm:h-24">
+            <polygon points="0,0 60,40 0,80" fill="#FF6B00" />
           </svg>
-        </div>
-        <div className="absolute top-0 right-20 sm:right-32 w-20 h-20 sm:w-32 sm:h-32 opacity-15 pointer-events-none">
-          <svg viewBox="0 0 200 200" className="w-full h-full">
-            <polygon points="200,0 200,200 0,200" fill="#FFFFFF" />
+          <svg width="50" height="70" viewBox="0 0 50 70" className="sm:w-16 sm:h-20">
+            <polygon points="0,0 50,35 0,70" fill="#FFFFFF" />
           </svg>
-        </div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-36 sm:h-36 opacity-15 pointer-events-none">
-          <svg viewBox="0 0 200 200" className="w-full h-full">
-            <polygon points="0,200 0,0 200,0" fill="#FF6B00" />
+          <svg width="40" height="60" viewBox="0 0 40 60" className="sm:w-12 sm:h-16">
+            <polygon points="0,0 40,30 0,60" fill="#FF6B00" />
           </svg>
         </div>
         
