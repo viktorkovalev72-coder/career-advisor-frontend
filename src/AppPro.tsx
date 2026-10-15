@@ -163,18 +163,23 @@ export default function AppPro() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
       {/* Header */}
       <header className="relative border-b border-blue-200/30 backdrop-blur-sm bg-gradient-to-r from-blue-600 to-blue-700 overflow-hidden">
-        {/* Брендовые треугольники Работа России - направленные стрелки */}
-        <div className="absolute top-0 right-0 flex items-center gap-1 opacity-30 pointer-events-none">
-          <svg width="60" height="80" viewBox="0 0 60 80" className="sm:w-20 sm:h-24">
-            <polygon points="0,0 60,40 0,80" fill="#FF6B00" />
-          </svg>
-          <svg width="50" height="70" viewBox="0 0 50 70" className="sm:w-16 sm:h-20">
-            <polygon points="0,0 50,35 0,70" fill="#FFFFFF" />
-          </svg>
-          <svg width="40" height="60" viewBox="0 0 40 60" className="sm:w-12 sm:h-16">
-            <polygon points="0,0 40,30 0,60" fill="#FF6B00" />
-          </svg>
-        </div>
+        {/* Логотип Работа России */}
+        <a 
+          href="https://czn.cap.ru/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="absolute top-2 right-2 sm:top-4 sm:right-4 pointer-events-auto"
+          title="Кадровый центр Работа России"
+        >
+          <img 
+            src="https://hh.kz/employer-logo/7208432.png" 
+            alt="Работа России" 
+            className="h-12 sm:h-16 w-auto object-contain"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        </a>
         
         <div className="relative max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="flex items-center">
