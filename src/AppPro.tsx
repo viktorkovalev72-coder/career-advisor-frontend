@@ -278,20 +278,21 @@ export default function AppPro() {
               <h3 className="text-white font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
                 <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
                 Зарплата (₽)
-              </h3>                <div className="flex gap-2">
+              </h3>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="number"
                     placeholder="От"
                     value={salaryFrom || ''}
                     onChange={e => setSalaryFrom(e.target.value ? parseInt(e.target.value) : undefined)}
-                    className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 text-sm"
+                    className="w-full sm:flex-1 px-2 py-2 sm:px-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 text-xs sm:text-sm"
                   />
                   <input
                     type="number"
                     placeholder="До"
                     value={salaryTo || ''}
                     onChange={e => setSalaryTo(e.target.value ? parseInt(e.target.value) : undefined)}
-                    className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 text-sm"
+                    className="w-full sm:flex-1 px-2 py-2 sm:px-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 text-xs sm:text-sm"
                   />
                 </div>
               </div>
