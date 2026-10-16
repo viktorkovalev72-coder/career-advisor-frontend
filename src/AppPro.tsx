@@ -209,7 +209,7 @@ export default function AppPro() {
                 <img 
                   src="https://hh.kz/employer-logo/7208432.png" 
                   alt="Работа России" 
-                  className="h-10 sm:h-14 w-auto object-contain bg-white rounded-lg p-1"
+                  className="h-10 sm:h-14 w-auto object-contain"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
