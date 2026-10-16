@@ -354,9 +354,17 @@ export default function AppPro() {
             {/* City & Filters */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               {/* City */}
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6">
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
-                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+              <div className={`backdrop-blur-md rounded-2xl p-4 sm:p-6 ${
+                theme === 'dark' ? 'bg-white/5 border border-white/10' :
+                theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+                'bg-yellow-50 border-2 border-black'
+              }`}>
+              <h3 className={`font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base ${
+                theme === 'dark' ? 'text-white' :
+                theme === 'light' ? 'text-blue-900' :
+                'text-black'
+              }`}>
+                <MapPin className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'high-contrast' ? 'text-black' : 'text-blue-400'}`} />
                 Город
               </h3>                <select
                   value={selectedCity.name}
@@ -364,10 +372,14 @@ export default function AppPro() {
                     const city = CITIES.find(c => c.name === e.target.value);
                     if (city) setSelectedCity(city);
                   }}
-                  className="w-full px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm"
+                  className={`w-full px-3 sm:px-4 py-2 rounded-lg text-sm focus:outline-none ${
+                    theme === 'dark' ? 'bg-white/10 border border-white/20 text-white focus:border-blue-500' :
+                    theme === 'light' ? 'bg-blue-50 border border-blue-200 text-blue-900 focus:border-blue-500' :
+                    'bg-white border-2 border-black text-black focus:border-yellow-500'
+                  }`}
                 >
                   {CITIES.map(city => (
-                    <option key={city.name} value={city.name} className="bg-gray-800">
+                    <option key={city.name} value={city.name} className={theme === 'dark' ? 'bg-gray-800' : 'bg-white'}>
                       {city.name}
                     </option>
                   ))}
@@ -375,9 +387,17 @@ export default function AppPro() {
               </div>
 
               {/* Salary */}
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6">
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
-                <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+              <div className={`backdrop-blur-md rounded-2xl p-4 sm:p-6 ${
+                theme === 'dark' ? 'bg-white/5 border border-white/10' :
+                theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+                'bg-yellow-50 border-2 border-black'
+              }`}>
+              <h3 className={`font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base ${
+                theme === 'dark' ? 'text-white' :
+                theme === 'light' ? 'text-blue-900' :
+                'text-black'
+              }`}>
+                <Filter className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'high-contrast' ? 'text-black' : 'text-blue-400'}`} />
                 Зарплата (₽)
               </h3>
                 <div className="flex flex-col sm:flex-row gap-2">
@@ -386,14 +406,22 @@ export default function AppPro() {
                     placeholder="От"
                     value={salaryFrom || ''}
                     onChange={e => setSalaryFrom(e.target.value ? parseInt(e.target.value) : undefined)}
-                    className="w-full sm:flex-1 px-2 py-2 sm:px-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 text-xs sm:text-sm"
+                    className={`w-full sm:flex-1 px-2 py-2 sm:px-3 rounded-lg text-xs sm:text-sm focus:outline-none ${
+                      theme === 'dark' ? 'bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-blue-500' :
+                      theme === 'light' ? 'bg-blue-50 border border-blue-200 text-blue-900 placeholder-blue-400 focus:border-blue-500' :
+                      'bg-white border-2 border-black text-black placeholder-gray-500 focus:border-yellow-500'
+                    }`}
                   />
                   <input
                     type="number"
                     placeholder="До"
                     value={salaryTo || ''}
                     onChange={e => setSalaryTo(e.target.value ? parseInt(e.target.value) : undefined)}
-                    className="w-full sm:flex-1 px-2 py-2 sm:px-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 text-xs sm:text-sm"
+                    className={`w-full sm:flex-1 px-2 py-2 sm:px-3 rounded-lg text-xs sm:text-sm focus:outline-none ${
+                      theme === 'dark' ? 'bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-blue-500' :
+                      theme === 'light' ? 'bg-blue-50 border border-blue-200 text-blue-900 placeholder-blue-400 focus:border-blue-500' :
+                      'bg-white border-2 border-black text-black placeholder-gray-500 focus:border-yellow-500'
+                    }`}
                   />
                 </div>
               </div>
@@ -401,8 +429,16 @@ export default function AppPro() {
 
             {/* Employment & Experience */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-                <h3 className="text-white font-semibold mb-3">Тип занятости</h3>
+              <div className={`backdrop-blur-md rounded-2xl p-6 ${
+                theme === 'dark' ? 'bg-white/5 border border-white/10' :
+                theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+                'bg-yellow-50 border-2 border-black'
+              }`}>
+                <h3 className={`font-semibold mb-3 ${
+                  theme === 'dark' ? 'text-white' :
+                  theme === 'light' ? 'text-blue-900' :
+                  'text-black'
+                }`}>Тип занятости</h3>
                 <div className="flex flex-wrap gap-2">
                   {EMPLOYMENT_TYPES.map(type => (
                     <button
@@ -416,8 +452,10 @@ export default function AppPro() {
                       }}
                       className={`px-3 py-1 rounded-full text-sm cursor-pointer ${
                         selectedEmployment.includes(type.id)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white/10 text-blue-200 hover:bg-white/20'
+                          ? theme === 'high-contrast' ? 'bg-yellow-400 text-black' : 'bg-blue-600 text-white'
+                          : theme === 'dark' ? 'bg-white/10 text-blue-200 hover:bg-white/20' :
+                            theme === 'light' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' :
+                            'bg-white border-2 border-black text-black hover:bg-yellow-100'
                       }`}
                     >
                       {type.name}
@@ -426,8 +464,16 @@ export default function AppPro() {
                 </div>
               </div>
 
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-                <h3 className="text-white font-semibold mb-3">Опыт работы</h3>
+              <div className={`backdrop-blur-md rounded-2xl p-6 ${
+                theme === 'dark' ? 'bg-white/5 border border-white/10' :
+                theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+                'bg-yellow-50 border-2 border-black'
+              }`}>
+                <h3 className={`font-semibold mb-3 ${
+                  theme === 'dark' ? 'text-white' :
+                  theme === 'light' ? 'text-blue-900' :
+                  'text-black'
+                }`}>Опыт работы</h3>
                 <div className="flex flex-wrap gap-2">
                   {EXPERIENCE_LEVELS.map(level => (
                     <button
@@ -441,8 +487,10 @@ export default function AppPro() {
                       }}
                       className={`px-3 py-1 rounded-full text-sm cursor-pointer ${
                         selectedExperience.includes(level.id)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white/10 text-blue-200 hover:bg-white/20'
+                          ? theme === 'high-contrast' ? 'bg-yellow-400 text-black' : 'bg-blue-600 text-white'
+                          : theme === 'dark' ? 'bg-white/10 text-blue-200 hover:bg-white/20' :
+                            theme === 'light' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' :
+                            'bg-white border-2 border-black text-black hover:bg-yellow-100'
                       }`}
                     >
                       {level.name}
@@ -453,16 +501,28 @@ export default function AppPro() {
             </div>
 
             {/* Date filter */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-blue-400" />
+            <div className={`backdrop-blur-md rounded-2xl p-6 ${
+              theme === 'dark' ? 'bg-white/5 border border-white/10' :
+              theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+              'bg-yellow-50 border-2 border-black'
+            }`}>
+              <h3 className={`font-semibold mb-3 flex items-center gap-2 ${
+                theme === 'dark' ? 'text-white' :
+                theme === 'light' ? 'text-blue-900' :
+                'text-black'
+              }`}>
+                <FileText className={`w-5 h-5 ${theme === 'high-contrast' ? 'text-black' : 'text-blue-400'}`} />
                 Дата публикации (не ранее)
               </h3>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={e => setDateFrom(e.target.value)}
-                className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                className={`px-4 py-2 rounded-lg focus:outline-none ${
+                  theme === 'dark' ? 'bg-white/10 border border-white/20 text-white focus:border-blue-500' :
+                  theme === 'light' ? 'bg-blue-50 border border-blue-200 text-blue-900 focus:border-blue-500' :
+                  'bg-white border-2 border-black text-black focus:border-yellow-500'
+                }`}
               />
             </div>
 
@@ -522,17 +582,33 @@ export default function AppPro() {
             {/* Vacancies list */}
             {vacancies.length > 0 ? (
               Object.entries(groupBySource(vacancies)).map(([source, items]) => (
-                <div key={source} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-3 sm:p-6 mb-4">
-                  <h3 className="text-white font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
-                    <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                <div key={source} className={`backdrop-blur-md rounded-2xl p-3 sm:p-6 mb-4 ${
+                  theme === 'dark' ? 'bg-white/5 border border-white/10' :
+                  theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+                  'bg-yellow-50 border-2 border-black'
+                }`}>
+                  <h3 className={`font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base ${
+                    theme === 'dark' ? 'text-white' :
+                    theme === 'light' ? 'text-blue-900' :
+                    'text-black'
+                  }`}>
+                    <span className={`w-2 h-2 rounded-full ${theme === 'high-contrast' ? 'bg-black' : 'bg-blue-400'}`}></span>
                     {source}
-                    <span className="text-blue-300 text-xs sm:text-sm font-normal">({items.length})</span>
+                    <span className={`text-xs sm:text-sm font-normal ${
+                      theme === 'dark' ? 'text-blue-300' :
+                      theme === 'light' ? 'text-blue-600' :
+                      'text-black'
+                    }`}>({items.length})</span>
                   </h3>
                   <div className="space-y-2">
                     {items.map((vacancy, i) => (
                       <div
                         key={vacancy.id + '-' + i}
-                        className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-white/5 border border-white/5 hover:border-purple-500/30 transition-all group"
+                        className={`flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl transition-all group ${
+                          theme === 'dark' ? 'bg-white/5 border border-white/5 hover:border-purple-500/30' :
+                          theme === 'light' ? 'bg-blue-50 border border-blue-100 hover:border-blue-300' :
+                          'bg-white border-2 border-black hover:border-yellow-500'
+                        }`}
                       >
                         <button
                           onClick={() => handleToggleFavorite(vacancy)}
@@ -546,7 +622,11 @@ export default function AppPro() {
                             href={vacancy.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-white text-sm font-medium hover:text-blue-300 transition-colors"
+                            className={`text-sm font-medium transition-colors ${
+                              theme === 'dark' ? 'text-white hover:text-blue-300' :
+                              theme === 'light' ? 'text-blue-900 hover:text-blue-600' :
+                              'text-black hover:text-yellow-700'
+                            }`}
                           >
                             {vacancy.title}
                           </a>
@@ -634,37 +714,93 @@ export default function AppPro() {
           <div className="space-y-3 sm:space-y-4">
             {/* Summary cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6">
-                <p className="text-blue-200/60 text-xs sm:text-sm">Всего вакансий</p>
-                <p className="text-white text-2xl sm:text-3xl font-bold mt-2">{analytics.totalVacancies}</p>
+              <div className={`backdrop-blur-md rounded-2xl p-4 sm:p-6 ${
+                theme === 'dark' ? 'bg-white/5 border border-white/10' :
+                theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+                'bg-yellow-50 border-2 border-black'
+              }`}>
+                <p className={`text-xs sm:text-sm ${
+                  theme === 'dark' ? 'text-blue-200/60' :
+                  theme === 'light' ? 'text-blue-600' :
+                  'text-black'
+                }`}>Всего вакансий</p>
+                <p className={`text-2xl sm:text-3xl font-bold mt-2 ${
+                  theme === 'dark' ? 'text-white' :
+                  theme === 'light' ? 'text-blue-900' :
+                  'text-black'
+                }`}>{analytics.totalVacancies}</p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6">
-                <p className="text-blue-200/60 text-xs sm:text-sm">Средняя зарплата</p>
-                <p className="text-emerald-300 text-xl sm:text-3xl font-bold mt-2 break-words">
+              <div className={`backdrop-blur-md rounded-2xl p-4 sm:p-6 ${
+                theme === 'dark' ? 'bg-white/5 border border-white/10' :
+                theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+                'bg-yellow-50 border-2 border-black'
+              }`}>
+                <p className={`text-xs sm:text-sm ${
+                  theme === 'dark' ? 'text-blue-200/60' :
+                  theme === 'light' ? 'text-blue-600' :
+                  'text-black'
+                }`}>Средняя зарплата</p>
+                <p className={`text-xl sm:text-3xl font-bold mt-2 break-words ${
+                  theme === 'dark' ? 'text-emerald-300' :
+                  theme === 'light' ? 'text-green-600' :
+                  'text-black'
+                }`}>
                   {analytics.averageSalary > 0 ? `${analytics.averageSalary.toLocaleString('ru-RU')} ₽` : '—'}
                 </p>
               </div>
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6">
-                <p className="text-blue-200/60 text-xs sm:text-sm">Источников</p>
-                <p className="text-white text-2xl sm:text-3xl font-bold mt-2">{Object.keys(analytics.bySource).length}</p>
+              <div className={`backdrop-blur-md rounded-2xl p-4 sm:p-6 ${
+                theme === 'dark' ? 'bg-white/5 border border-white/10' :
+                theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+                'bg-yellow-50 border-2 border-black'
+              }`}>
+                <p className={`text-xs sm:text-sm ${
+                  theme === 'dark' ? 'text-blue-200/60' :
+                  theme === 'light' ? 'text-blue-600' :
+                  'text-black'
+                }`}>Источников</p>
+                <p className={`text-2xl sm:text-3xl font-bold mt-2 ${
+                  theme === 'dark' ? 'text-white' :
+                  theme === 'light' ? 'text-blue-900' :
+                  'text-black'
+                }`}>{Object.keys(analytics.bySource).length}</p>
               </div>
             </div>
 
             {/* By source */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-3 sm:p-6">
-              <h3 className="text-white font-semibold mb-3 sm:mb-4 text-sm sm:text-base">По источникам</h3>
+            <div className={`backdrop-blur-md rounded-2xl p-3 sm:p-6 ${
+              theme === 'dark' ? 'bg-white/5 border border-white/10' :
+              theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+              'bg-yellow-50 border-2 border-black'
+            }`}>
+              <h3 className={`font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
+                theme === 'dark' ? 'text-white' :
+                theme === 'light' ? 'text-blue-900' :
+                'text-black'
+              }`}>По источникам</h3>
               <div className="space-y-2">
                 {Object.entries(analytics.bySource).map(([source, count]) => (
                   <div key={source} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                    <span className="text-blue-200 text-xs sm:text-sm sm:w-40 break-words">{source}</span>
+                    <span className={`text-xs sm:text-sm sm:w-40 break-words ${
+                      theme === 'dark' ? 'text-blue-200' :
+                      theme === 'light' ? 'text-blue-800' :
+                      'text-black'
+                    }`}>{source}</span>
                     <div className="flex items-center gap-2 sm:gap-3 flex-1">
-                      <div className="flex-1 bg-white/10 rounded-full h-3 sm:h-4 overflow-hidden">
+                      <div className={`flex-1 rounded-full h-3 sm:h-4 overflow-hidden ${
+                        theme === 'dark' ? 'bg-white/10' :
+                        theme === 'light' ? 'bg-blue-100' :
+                        'bg-yellow-200'
+                      }`}>
                         <div
                           className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"
                           style={{ width: `${(count / analytics.totalVacancies) * 100}%` }}
                         ></div>
                       </div>
-                      <span className="text-white text-xs sm:text-sm font-medium w-10 sm:w-12 text-right">{count}</span>
+                      <span className={`text-xs sm:text-sm font-medium w-10 sm:w-12 text-right ${
+                        theme === 'dark' ? 'text-white' :
+                        theme === 'light' ? 'text-blue-900' :
+                        'text-black'
+                      }`}>{count}</span>
                     </div>
                   </div>
                 ))}
@@ -672,20 +808,40 @@ export default function AppPro() {
             </div>
 
             {/* Salary distribution */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-3 sm:p-6">
-              <h3 className="text-white font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Распределение зарплат</h3>
+            <div className={`backdrop-blur-md rounded-2xl p-3 sm:p-6 ${
+              theme === 'dark' ? 'bg-white/5 border border-white/10' :
+              theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+              'bg-yellow-50 border-2 border-black'
+            }`}>
+              <h3 className={`font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
+                theme === 'dark' ? 'text-white' :
+                theme === 'light' ? 'text-blue-900' :
+                'text-black'
+              }`}>Распределение зарплат</h3>
               <div className="space-y-2">
                 {analytics.salaryDistribution.map((item, i) => (
                   <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                    <span className="text-blue-200 text-xs sm:text-sm sm:w-40 break-words">{item.range}</span>
+                    <span className={`text-xs sm:text-sm sm:w-40 break-words ${
+                      theme === 'dark' ? 'text-blue-200' :
+                      theme === 'light' ? 'text-blue-800' :
+                      'text-black'
+                    }`}>{item.range}</span>
                     <div className="flex items-center gap-2 sm:gap-3 flex-1">
-                      <div className="flex-1 bg-white/10 rounded-full h-3 sm:h-4 overflow-hidden">
+                      <div className={`flex-1 rounded-full h-3 sm:h-4 overflow-hidden ${
+                        theme === 'dark' ? 'bg-white/10' :
+                        theme === 'light' ? 'bg-blue-100' :
+                        'bg-yellow-200'
+                      }`}>
                         <div
                           className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
                           style={{ width: `${analytics.totalVacancies > 0 ? (item.count / analytics.totalVacancies) * 100 : 0}%` }}
                         ></div>
                       </div>
-                      <span className="text-white text-xs sm:text-sm font-medium w-10 sm:w-12 text-right">{item.count}</span>
+                      <span className={`text-xs sm:text-sm font-medium w-10 sm:w-12 text-right ${
+                        theme === 'dark' ? 'text-white' :
+                        theme === 'light' ? 'text-blue-900' :
+                        'text-black'
+                      }`}>{item.count}</span>
                     </div>
                   </div>
                 ))}
@@ -693,13 +849,33 @@ export default function AppPro() {
             </div>
 
             {/* By employment */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-3 sm:p-6">
-              <h3 className="text-white font-semibold mb-3 sm:mb-4 text-sm sm:text-base">По типу занятости</h3>
+            <div className={`backdrop-blur-md rounded-2xl p-3 sm:p-6 ${
+              theme === 'dark' ? 'bg-white/5 border border-white/10' :
+              theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+              'bg-yellow-50 border-2 border-black'
+            }`}>
+              <h3 className={`font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
+                theme === 'dark' ? 'text-white' :
+                theme === 'light' ? 'text-blue-900' :
+                'text-black'
+              }`}>По типу занятости</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {Object.entries(analytics.byEmployment).map(([type, count]) => (
-                  <div key={type} className="bg-white/5 rounded-lg p-2 sm:p-3 border border-white/5">
-                    <p className="text-blue-200 text-xs break-words">{type}</p>
-                    <p className="text-white text-base sm:text-lg font-bold">{count}</p>
+                  <div key={type} className={`rounded-lg p-2 sm:p-3 ${
+                    theme === 'dark' ? 'bg-white/5 border border-white/5' :
+                    theme === 'light' ? 'bg-blue-50 border border-blue-200' :
+                    'bg-yellow-100 border-2 border-black'
+                  }`}>
+                    <p className={`text-xs break-words ${
+                      theme === 'dark' ? 'text-blue-200' :
+                      theme === 'light' ? 'text-blue-800' :
+                      'text-black'
+                    }`}>{type}</p>
+                    <p className={`text-base sm:text-lg font-bold ${
+                      theme === 'dark' ? 'text-white' :
+                      theme === 'light' ? 'text-blue-900' :
+                      'text-black'
+                    }`}>{count}</p>
                   </div>
                 ))}
               </div>
@@ -709,30 +885,54 @@ export default function AppPro() {
 
         {/* About Tab */}
         {activeTab === 'about' && (
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
+          <div className={`backdrop-blur-md rounded-2xl p-6 ${
+            theme === 'dark' ? 'bg-white/5 border border-white/10' :
+            theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+            'bg-yellow-50 border-2 border-black'
+          }`}>
             <div className="mb-6">
-              <h3 className="text-white font-semibold text-lg flex items-center gap-2">
-                <Shield className="w-5 h-5 text-blue-300 flex-shrink-0" />
+              <h3 className={`font-semibold text-lg flex items-center gap-2 ${
+                theme === 'dark' ? 'text-white' :
+                theme === 'light' ? 'text-blue-900' :
+                'text-black'
+              }`}>
+                <Shield className={`w-5 h-5 flex-shrink-0 ${theme === 'high-contrast' ? 'text-black' : 'text-blue-300'}`} />
                 Карьерный консультант PRO
               </h3>
               <a 
                 href="https://czn.cap.ru/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-blue-200 text-sm hover:text-blue-100 hover:underline transition-colors inline-flex items-center gap-1 mt-1"
+                className={`text-sm hover:underline transition-colors inline-flex items-center gap-1 mt-1 ${
+                  theme === 'dark' ? 'text-blue-200 hover:text-blue-100' :
+                  theme === 'light' ? 'text-blue-600 hover:text-blue-800' :
+                  'text-black hover:text-yellow-700 underline'
+                }`}
               >
                 Кадровый центр "Работа России" Чувашской Республики
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
             
-            <div className="space-y-4 text-blue-100/80 text-sm">
+            <div className={`space-y-4 text-sm ${
+              theme === 'dark' ? 'text-blue-100/80' :
+              theme === 'light' ? 'text-blue-800' :
+              'text-black'
+            }`}>
 
               <p>Расширенная версия приложения для профессионального подбора вакансий с использованием официальных источников.</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-2">🔍 Гибкий поиск</h4>
+                <div className={`rounded-xl p-4 ${
+                  theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' :
+                  theme === 'light' ? 'bg-blue-50 border border-blue-200' :
+                  'bg-yellow-100 border-2 border-black'
+                }`}>
+                  <h4 className={`font-medium mb-2 ${
+                    theme === 'dark' ? 'text-white' :
+                    theme === 'light' ? 'text-blue-900' :
+                    'text-black'
+                  }`}>🔍 Гибкий поиск</h4>
                   <ul className="space-y-1 text-xs">
                     <li>• Пользовательские ключевые запросы</li>
                     <li>• Выбор из городов ПФО</li>
@@ -740,16 +940,32 @@ export default function AppPro() {
                     <li>• Фильтр по дате публикации</li>
                   </ul>
                 </div>
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-2">💼 Фильтры</h4>
+                <div className={`rounded-xl p-4 ${
+                  theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' :
+                  theme === 'light' ? 'bg-blue-50 border border-blue-200' :
+                  'bg-yellow-100 border-2 border-black'
+                }`}>
+                  <h4 className={`font-medium mb-2 ${
+                    theme === 'dark' ? 'text-white' :
+                    theme === 'light' ? 'text-blue-900' :
+                    'text-black'
+                  }`}>💼 Фильтры</h4>
                   <ul className="space-y-1 text-xs">
                     <li>• Тип занятости (полная, удалёнка, вахта)</li>
                     <li>• Уровень опыта</li>
                     <li>• Автоматическая дедупликация</li>
                   </ul>
                 </div>
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-2">💾 Сохранение</h4>
+                <div className={`rounded-xl p-4 ${
+                  theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' :
+                  theme === 'light' ? 'bg-blue-50 border border-blue-200' :
+                  'bg-yellow-100 border-2 border-black'
+                }`}>
+                  <h4 className={`font-medium mb-2 ${
+                    theme === 'dark' ? 'text-white' :
+                    theme === 'light' ? 'text-blue-900' :
+                    'text-black'
+                  }`}>💾 Сохранение</h4>
                   <ul className="space-y-1 text-xs">
                     <li>• Избранные вакансии</li>
                     <li>• Экспорт в PDF (на русском)</li>
@@ -757,8 +973,16 @@ export default function AppPro() {
                     <li>• Отправка на email</li>
                   </ul>
                 </div>
-                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-                  <h4 className="text-white font-medium mb-2">📊 Аналитика</h4>
+                <div className={`rounded-xl p-4 ${
+                  theme === 'dark' ? 'bg-blue-500/10 border border-blue-500/20' :
+                  theme === 'light' ? 'bg-blue-50 border border-blue-200' :
+                  'bg-yellow-100 border-2 border-black'
+                }`}>
+                  <h4 className={`font-medium mb-2 ${
+                    theme === 'dark' ? 'text-white' :
+                    theme === 'light' ? 'text-blue-900' :
+                    'text-black'
+                  }`}>📊 Аналитика</h4>
                   <ul className="space-y-1 text-xs">
                     <li>• Средняя зарплата</li>
                     <li>• Распределение по источникам</li>
@@ -768,34 +992,66 @@ export default function AppPro() {
                 </div>
               </div>
 
-              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
-                <h4 className="text-white font-medium mb-2">🔔 Уведомления</h4>
+              <div className={`rounded-xl p-4 ${
+                theme === 'dark' ? 'bg-emerald-500/10 border border-emerald-500/20' :
+                theme === 'light' ? 'bg-green-50 border border-green-200' :
+                'bg-yellow-100 border-2 border-black'
+              }`}>
+                <h4 className={`font-medium mb-2 ${
+                  theme === 'dark' ? 'text-white' :
+                  theme === 'light' ? 'text-green-900' :
+                  'text-black'
+                }`}>🔔 Уведомления</h4>
                 <p className="text-xs">Приложение поддерживает push-уведомления о завершении поиска и новых вакансиях.</p>
               </div>
 
-              <div className="bg-blue-600/10 border border-blue-500/20 rounded-xl p-4 mt-6">
-                <h4 className="text-white font-medium mb-2">🔗 Полезные ссылки</h4>
+              <div className={`rounded-xl p-4 mt-6 ${
+                theme === 'dark' ? 'bg-blue-600/10 border border-blue-500/20' :
+                theme === 'light' ? 'bg-blue-50 border border-blue-200' :
+                'bg-yellow-100 border-2 border-black'
+              }`}>
+                <h4 className={`font-medium mb-2 ${
+                  theme === 'dark' ? 'text-white' :
+                  theme === 'light' ? 'text-blue-900' :
+                  'text-black'
+                }`}>🔗 Полезные ссылки</h4>
                 <ul className="space-y-2 text-xs">
                   <li>
-                    <a href="https://czn.cap.ru/" target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-blue-200 flex items-center gap-2">
+                    <a href="https://czn.cap.ru/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${
+                      theme === 'dark' ? 'text-blue-300 hover:text-blue-200' :
+                      theme === 'light' ? 'text-blue-600 hover:text-blue-800' :
+                      'text-black hover:text-yellow-700 underline'
+                    }`}>
                       <ExternalLink className="w-3 h-3" />
                       Кадровый центр "Работа России" Чувашской Республики
                     </a>
                   </li>
                   <li>
-                    <a href="https://trudvsem.ru/" target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-blue-200 flex items-center gap-2">
+                    <a href="https://trudvsem.ru/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${
+                      theme === 'dark' ? 'text-blue-300 hover:text-blue-200' :
+                      theme === 'light' ? 'text-blue-600 hover:text-blue-800' :
+                      'text-black hover:text-yellow-700 underline'
+                    }`}>
                       <ExternalLink className="w-3 h-3" />
                       Портал "Работа России" (федеральный)
                     </a>
                   </li>
                   <li>
-                    <a href="https://vk.ru/czn_cheb" target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-blue-200 flex items-center gap-2">
+                    <a href="https://vk.ru/czn_cheb" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${
+                      theme === 'dark' ? 'text-blue-300 hover:text-blue-200' :
+                      theme === 'light' ? 'text-blue-600 hover:text-blue-800' :
+                      'text-black hover:text-yellow-700 underline'
+                    }`}>
                       <ExternalLink className="w-3 h-3" />
                       Официальная страничка Вконтакте Кадрового центра "Работа России" Чувашской Республики
                     </a>
                   </li>
                   <li>
-                    <a href="https://vk.ru/viktorkovalev" target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-blue-200 flex items-center gap-2">
+                    <a href="https://vk.ru/viktorkovalev" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${
+                      theme === 'dark' ? 'text-blue-300 hover:text-blue-200' :
+                      theme === 'light' ? 'text-blue-600 hover:text-blue-800' :
+                      'text-black hover:text-yellow-700 underline'
+                    }`}>
                       <ExternalLink className="w-3 h-3" />
                       Официальная страничка Вконтакте директора Кадрового центра "Работа России" Чувашской Республики
                     </a>
@@ -810,9 +1066,17 @@ export default function AppPro() {
       {/* Email Modal */}
       {showEmailModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 border border-white/10 rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-              <Mail className="w-5 h-5 text-blue-400" />
+          <div className={`rounded-2xl p-6 max-w-md w-full ${
+            theme === 'dark' ? 'bg-slate-800 border border-white/10' :
+            theme === 'light' ? 'bg-white border border-blue-200' :
+            'bg-yellow-50 border-2 border-black'
+          }`}>
+            <h3 className={`font-semibold mb-4 flex items-center gap-2 ${
+              theme === 'dark' ? 'text-white' :
+              theme === 'light' ? 'text-blue-900' :
+              'text-black'
+            }`}>
+              <Mail className={`w-5 h-5 ${theme === 'high-contrast' ? 'text-black' : 'text-blue-400'}`} />
               Отправить отчёт на email
             </h3>
             <input
@@ -820,18 +1084,29 @@ export default function AppPro() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="Введите email"
-              className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-purple-500 mb-4"
+              className={`w-full px-4 py-2 rounded-lg mb-4 focus:outline-none ${
+                theme === 'dark' ? 'bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-purple-500' :
+                theme === 'light' ? 'bg-blue-50 border border-blue-200 text-blue-900 placeholder-blue-400 focus:border-blue-500' :
+                'bg-white border-2 border-black text-black placeholder-gray-500 focus:border-yellow-500'
+              }`}
             />
             <div className="flex gap-2">
               <button
                 onClick={handleSendEmail}
-                className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg cursor-pointer"
+                className={`flex-1 py-2 rounded-lg cursor-pointer ${
+                  theme === 'high-contrast' ? 'bg-yellow-400 text-black hover:bg-yellow-500' :
+                  'bg-blue-600 hover:bg-blue-500 text-white'
+                }`}
               >
                 Отправить
               </button>
               <button
                 onClick={() => setShowEmailModal(false)}
-                className="flex-1 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg cursor-pointer"
+                className={`flex-1 py-2 rounded-lg cursor-pointer ${
+                  theme === 'dark' ? 'bg-white/10 hover:bg-white/20 text-white' :
+                  theme === 'light' ? 'bg-blue-100 hover:bg-blue-200 text-blue-900' :
+                  'bg-gray-200 hover:bg-gray-300 text-black'
+                }`}
               >
                 Отмена
               </button>
@@ -842,10 +1117,10 @@ export default function AppPro() {
 
       {/* Инструкция */}
       {showInstruction && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 p-4 flex items-start justify-center overflow-y-auto">
           <div className={`rounded-2xl p-6 max-w-3xl w-full my-8 ${
             theme === 'dark' ? 'bg-slate-800 border border-white/10' :
-            theme === 'light' ? 'bg-white border border-blue-200' :
+            theme === 'light' ? 'bg-white border border-blue-200 shadow-xl' :
             'bg-yellow-50 border-2 border-black'
           } ${theme === 'high-contrast' ? 'text-base' : ''}`}>
             <div className="flex items-center justify-between mb-6">
