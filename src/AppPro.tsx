@@ -8,6 +8,7 @@ import { calculateAnalytics } from './services/analytics';
 import { getFavorites, toggleFavorite, isFavorite } from './services/favorites';
 import { requestNotificationPermission, notifySearchComplete } from './services/notifications';
 import { openMailClient } from './services/emailService';
+import { checkSpelling, getSmartSuggestions } from './services/smartSearch';
 import {
   Shield, Search, FileText, ExternalLink, Briefcase, MapPin,
   Loader2, CheckCircle, AlertCircle, Download, Table, Mail,
@@ -18,6 +19,7 @@ export default function AppPro() {
   // Состояние фильтров
   const [keywords, setKeywords] = useState<string[]>([]);
   const [newKeyword, setNewKeyword] = useState('');
+  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState<string[]>([]);
   const [selectedCity, setSelectedCity] = useState(CITIES[0]);
   const [salaryFrom, setSalaryFrom] = useState<number | undefined>();
   const [salaryTo, setSalaryTo] = useState<number | undefined>();
@@ -54,14 +56,6 @@ export default function AppPro() {
   useEffect(() => {
     setFavorites(getFavorites());
   }, []);
-
-  // Добавление ключевого слова
-  const addKeyword = () => {
-    if (newKeyword.trim() && !keywords.includes(newKeyword.trim())) {
-      setKeywords([...keywords, newKeyword.trim()]);
-      setNewKeyword('');
-    }
-  };
 
   // Удаление ключевого слова
   const removeKeyword = (kw: string) => {
@@ -309,21 +303,96 @@ export default function AppPro() {
                 <Search className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'high-contrast' ? 'text-black' : 'text-blue-400'}`} />
                 Ключевые запросы
               </h3>
-              <div className="flex flex-col sm:flex-row gap-2 mb-3">
-                <input
-                  type="text"
-                  value={newKeyword}
-                  onChange={e => setNewKeyword(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && addKeyword()}
-                  placeholder="Введите должность (например: начальник службы безопасности)"
-                  className={`flex-1 px-3 sm:px-4 py-2 rounded-lg text-sm focus:outline-none ${
-                    theme === 'dark' ? 'bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-blue-500' :
-                    theme === 'light' ? 'bg-blue-50 border border-blue-200 text-blue-900 placeholder-blue-400 focus:border-blue-500' :
-                    'bg-white border-2 border-black text-black placeholder-gray-500 focus:border-yellow-500'
-                  }`}
-                />
+              <div className="flex flex-col sm:flex-row gap-2 mb-3 relative">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={newKeyword}
+                    onChange={async (e) => {
+                      const value = e.target.value;
+                      setNewKeyword(value);
+                      // Получаем подсказки при вводе
+                      if (value.length >= 2) {
+                        const suggestions = await getSmartSuggestions(value);
+                        setAutocompleteSuggestions(suggestions);
+                      } else {
+                        setAutocompleteSuggestions([]);
+                      }
+                    }}
+                    onKeyDown={async (e) => {
+                      if (e.key === 'Enter' && newKeyword.trim()) {
+                        // Проверяем орфографию перед добавлением
+                        const corrected = await checkSpelling(newKeyword.trim());
+                        if (corrected !== newKeyword.trim()) {
+                          if (confirm(`Возможно, вы имели в виду "${corrected}"?\n\nДобавить исправленный вариант?`)) {
+                            setKeywords([...keywords, corrected]);
+                            setNewKeyword('');
+                          } else {
+                            setKeywords([...keywords, newKeyword.trim()]);
+                            setNewKeyword('');
+                          }
+                        } else {
+                          setKeywords([...keywords, newKeyword.trim()]);
+                          setNewKeyword('');
+                        }
+                        setAutocompleteSuggestions([]);
+                      }
+                    }}
+                    placeholder="Введите должность (например: начальник службы безопасности)"
+                    className={`w-full px-3 sm:px-4 py-2 rounded-lg text-sm focus:outline-none ${
+                      theme === 'dark' ? 'bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-blue-500' :
+                      theme === 'light' ? 'bg-blue-50 border border-blue-200 text-blue-900 placeholder-blue-400 focus:border-blue-500' :
+                      'bg-white border-2 border-black text-black placeholder-gray-500 focus:border-yellow-500'
+                    }`}
+                  />
+                  
+                  {/* Выпадающий список подсказок */}
+                  {autocompleteSuggestions.length > 0 && (
+                    <div className={`absolute top-full left-0 right-0 mt-1 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto ${
+                      theme === 'dark' ? 'bg-slate-800 border border-white/20' :
+                      theme === 'light' ? 'bg-white border border-blue-200' :
+                      'bg-yellow-50 border-2 border-black'
+                    }`}>
+                      {autocompleteSuggestions.map((suggestion, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setNewKeyword(suggestion);
+                            setAutocompleteSuggestions([]);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                            theme === 'dark' ? 'text-white hover:bg-white/10' :
+                            theme === 'light' ? 'text-blue-900 hover:bg-blue-50' :
+                            'text-black hover:bg-yellow-100'
+                          }`}
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
                 <button
-                  onClick={addKeyword}
+                  onClick={async () => {
+                    if (newKeyword.trim()) {
+                      // Проверяем орфографию перед добавлением
+                      const corrected = await checkSpelling(newKeyword.trim());
+                      if (corrected !== newKeyword.trim()) {
+                        if (confirm(`Возможно, вы имели в виду "${corrected}"?\n\nДобавить исправленный вариант?`)) {
+                          setKeywords([...keywords, corrected]);
+                          setNewKeyword('');
+                        } else {
+                          setKeywords([...keywords, newKeyword.trim()]);
+                          setNewKeyword('');
+                        }
+                      } else {
+                        setKeywords([...keywords, newKeyword.trim()]);
+                        setNewKeyword('');
+                      }
+                      setAutocompleteSuggestions([]);
+                    }
+                  }}
                   className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 cursor-pointer text-sm font-medium ${
                     theme === 'high-contrast' ? 'bg-yellow-400 text-black hover:bg-yellow-500' :
                     'bg-blue-600 hover:bg-blue-500 text-white'
