@@ -36,6 +36,20 @@ export default function AppPro() {
   const [email, setEmail] = useState('');
   const [showEmailModal, setShowEmailModal] = useState(false);
 
+  // Тема приложения
+  const [theme, setTheme] = useState<'dark' | 'light' | 'high-contrast'>(() => {
+    const saved = localStorage.getItem('app-theme');
+    return (saved as 'dark' | 'light' | 'high-contrast') || 'dark';
+  });
+
+  // Инструкция
+  const [showInstruction, setShowInstruction] = useState(false);
+
+  // Применение темы
+  useEffect(() => {
+    localStorage.setItem('app-theme', theme);
+  }, [theme]);
+
   // Загрузка избранного
   useEffect(() => {
     setFavorites(getFavorites());
@@ -160,55 +174,77 @@ export default function AppPro() {
   const analytics = searchComplete ? calculateAnalytics(vacancies) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900">
+    <div className={`min-h-screen ${
+      theme === 'dark' ? 'bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900' :
+      theme === 'light' ? 'bg-gradient-to-br from-blue-50 via-white to-blue-50' :
+      'bg-white'
+    }`}>
       {/* Header */}
-      <header className="relative border-b border-blue-200/30 backdrop-blur-sm bg-gradient-to-r from-blue-600 to-blue-700 overflow-hidden">
-        {/* Логотип Работа России */}
-        <a 
-          href="https://czn.cap.ru/" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="absolute top-2 right-2 sm:top-4 sm:right-4 pointer-events-auto"
-          title="Кадровый центр Работа России"
-        >
-          <img 
-            src="https://hh.kz/employer-logo/7208432.png" 
-            alt="Работа России" 
-            className="h-12 sm:h-16 w-auto object-contain"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        </a>
-        
-        <div className="relative max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-          <div className="flex items-center">
-            <div>
-              <h1 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-blue-300 flex-shrink-0" />
-                Карьерный консультант <span className="text-blue-200">PRO</span>
-              </h1>
-              <p className="text-blue-100 text-[10px] sm:text-xs">Расширенный поиск вакансий с аналитикой</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="flex items-center gap-1 sm:gap-2">
-              <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-blue-200" />
-              <span className="text-white text-xs sm:text-sm">{selectedCity.name}</span>
-            </div>
-            {favorites.length > 0 && (
-              <div className="flex items-center gap-1 text-yellow-300">
-                <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-300" />
-                <span className="text-xs sm:text-sm text-white">{favorites.length}</span>
+      <header className={`relative border-b backdrop-blur-sm ${
+        theme === 'dark' ? 'border-blue-200/30 bg-gradient-to-r from-blue-600 to-blue-700' :
+        theme === 'light' ? 'border-blue-200 bg-gradient-to-r from-blue-500 to-blue-600' :
+        'border-black bg-black'
+      }`}>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div>
+                <h1 className={`font-bold text-base sm:text-lg flex items-center gap-2 ${
+                  theme === 'dark' ? 'text-white' :
+                  theme === 'light' ? 'text-white' :
+                  'text-yellow-300'
+                }`}>
+                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                  Карьерный консультант <span className={theme === 'high-contrast' ? 'text-yellow-300' : 'text-blue-200'}>PRO</span>
+                </h1>
+                <p className={`text-[10px] sm:text-xs ${
+                  theme === 'dark' ? 'text-blue-100' :
+                  theme === 'light' ? 'text-blue-100' :
+                  'text-yellow-200'
+                }`}>Расширенный поиск вакансий с аналитикой</p>
               </div>
-            )}
+            </div>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <a 
+                href="https://czn.cap.ru/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center"
+                title="Кадровый центр Работа России"
+              >
+                <img 
+                  src="https://hh.kz/employer-logo/7208432.png" 
+                  alt="Работа России" 
+                  className="h-10 sm:h-14 w-auto object-contain bg-white rounded-lg p-1"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              </a>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <MapPin className={`w-3 h-3 sm:w-4 sm:h-4 ${theme === 'high-contrast' ? 'text-yellow-300' : 'text-blue-200'}`} />
+                <span className={`text-xs sm:text-sm ${theme === 'high-contrast' ? 'text-white' : 'text-white'}`}>{selectedCity.name}</span>
+              </div>
+              {favorites.length > 0 && (
+                <div className="flex items-center gap-1 text-yellow-300">
+                  <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-300" />
+                  <span className="text-xs sm:text-sm text-white">{favorites.length}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+      <main className={`max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 ${
+        theme === 'high-contrast' ? 'text-xl' : ''
+      }`}>
         {/* Tabs */}
-        <div className="flex flex-wrap sm:flex-nowrap gap-1 bg-white/5 rounded-xl p-1 border border-white/10 mb-4 sm:mb-6">
+        <div className={`flex flex-wrap gap-1 rounded-xl p-1 mb-4 sm:mb-6 ${
+          theme === 'dark' ? 'bg-white/5 border border-white/10' :
+          theme === 'light' ? 'bg-blue-100 border border-blue-200' :
+          'bg-yellow-100 border-2 border-black'
+        }`}>
           {[
             { id: 'search', label: '🔍 Поиск', icon: Search },
             { id: 'results', label: `📋 Результаты (${vacancies.length})`, icon: FileText },
@@ -221,22 +257,56 @@ export default function AppPro() {
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex-1 px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all sm:whitespace-nowrap cursor-pointer text-center ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'text-blue-200 hover:text-white hover:bg-white/5'
+                  ? theme === 'high-contrast' ? 'bg-yellow-400 text-black shadow-lg' : 'bg-blue-600 text-white shadow-lg'
+                  : theme === 'high-contrast' ? 'text-black hover:bg-yellow-200' : 'text-blue-200 hover:text-white hover:bg-white/5'
               }`}
             >
               {tab.label}
             </button>
           ))}
+          {/* Переключатель темы */}
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : theme === 'light' ? 'high-contrast' : 'dark')}
+            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer flex items-center gap-1 ${
+              theme === 'high-contrast' ? 'bg-black text-yellow-300 hover:bg-gray-800' :
+              theme === 'light' ? 'bg-blue-200 text-blue-800 hover:bg-blue-300' :
+              'bg-white/10 text-blue-200 hover:bg-white/20'
+            }`}
+            title={theme === 'dark' ? 'Светлая тема' : theme === 'light' ? 'Для слабовидящих' : 'Тёмная тема'}
+          >
+            {theme === 'dark' ? '☀️' : theme === 'light' ? '👁️' : '🌙'}
+            <span className="hidden sm:inline">{theme === 'dark' ? 'Светлая' : theme === 'light' ? 'Контраст' : 'Тёмная'}</span>
+          </button>
+          {/* Кнопка инструкции */}
+          <button
+            onClick={() => setShowInstruction(true)}
+            className={`px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer flex items-center gap-1 ${
+              theme === 'high-contrast' ? 'bg-black text-yellow-300 hover:bg-gray-800' :
+              theme === 'light' ? 'bg-blue-200 text-blue-800 hover:bg-blue-300' :
+              'bg-white/10 text-blue-200 hover:bg-white/20'
+            }`}
+            title="Инструкция по использованию"
+          >
+            ❓
+            <span className="hidden sm:inline">Помощь</span>
+          </button>
         </div>
 
         {/* Search Tab */}
         {activeTab === 'search' && (
           <div className="space-y-3 sm:space-y-4">
             {/* Keywords */}
-            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 sm:p-6">
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base">
-                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+            <div className={`backdrop-blur-md rounded-2xl p-4 sm:p-6 ${
+              theme === 'dark' ? 'bg-white/5 border border-white/10' :
+              theme === 'light' ? 'bg-white border border-blue-200 shadow-md' :
+              'bg-yellow-50 border-2 border-black'
+            }`}>
+              <h3 className={`font-semibold mb-3 flex items-center gap-2 text-sm sm:text-base ${
+                theme === 'dark' ? 'text-white' :
+                theme === 'light' ? 'text-blue-900' :
+                'text-black'
+              }`}>
+                <Search className={`w-4 h-4 sm:w-5 sm:h-5 ${theme === 'high-contrast' ? 'text-black' : 'text-blue-400'}`} />
                 Ключевые запросы
               </h3>
               <div className="flex flex-col sm:flex-row gap-2 mb-3">
@@ -246,11 +316,18 @@ export default function AppPro() {
                   onChange={e => setNewKeyword(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addKeyword()}
                   placeholder="Введите должность (например: начальник службы безопасности)"
-                  className="flex-1 px-3 sm:px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-blue-500 text-sm"
+                  className={`flex-1 px-3 sm:px-4 py-2 rounded-lg text-sm focus:outline-none ${
+                    theme === 'dark' ? 'bg-white/10 border border-white/20 text-white placeholder-white/40 focus:border-blue-500' :
+                    theme === 'light' ? 'bg-blue-50 border border-blue-200 text-blue-900 placeholder-blue-400 focus:border-blue-500' :
+                    'bg-white border-2 border-black text-black placeholder-gray-500 focus:border-yellow-500'
+                  }`}
                 />
                 <button
                   onClick={addKeyword}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center justify-center gap-1 cursor-pointer text-sm"
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 cursor-pointer text-sm font-medium ${
+                    theme === 'high-contrast' ? 'bg-yellow-400 text-black hover:bg-yellow-500' :
+                    'bg-blue-600 hover:bg-blue-500 text-white'
+                  }`}
                 >
                   <Plus className="w-4 h-4" />
                   Добавить
@@ -258,9 +335,15 @@ export default function AppPro() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {keywords.map((kw, i) => (
-                  <span key={i} className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-blue-200 text-xs sm:text-sm">
+                  <span key={i} className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm ${
+                    theme === 'dark' ? 'bg-blue-500/20 border border-blue-500/30 text-blue-200' :
+                    theme === 'light' ? 'bg-blue-100 border border-blue-300 text-blue-800' :
+                    'bg-yellow-200 border-2 border-black text-black'
+                  }`}>
                     {kw}
-                    <button onClick={() => removeKeyword(kw)} className="hover:text-red-400 cursor-pointer">
+                    <button onClick={() => removeKeyword(kw)} className={`cursor-pointer ${
+                      theme === 'high-contrast' ? 'hover:text-red-600' : 'hover:text-red-400'
+                    }`}>
                       <X className="w-3 h-3" />
                     </button>
                   </span>
@@ -387,7 +470,11 @@ export default function AppPro() {
             <button
               onClick={performSearch}
               disabled={isSearching}
-              className="w-full py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-600 text-white font-bold text-base sm:text-lg rounded-xl transition-all shadow-lg shadow-blue-500/25 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className={`w-full py-3 sm:py-4 font-bold text-base sm:text-lg rounded-xl transition-all shadow-lg cursor-pointer disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                theme === 'high-contrast' 
+                  ? 'bg-yellow-400 hover:bg-yellow-500 text-black border-2 border-black shadow-black/25 disabled:bg-gray-400' 
+                  : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-600 text-white shadow-blue-500/25'
+              }`}
             >
               {isSearching ? (
                 <>
@@ -747,6 +834,227 @@ export default function AppPro() {
                 className="flex-1 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg cursor-pointer"
               >
                 Отмена
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Инструкция */}
+      {showInstruction && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className={`rounded-2xl p-6 max-w-3xl w-full my-8 ${
+            theme === 'dark' ? 'bg-slate-800 border border-white/10' :
+            theme === 'light' ? 'bg-white border border-blue-200' :
+            'bg-yellow-50 border-2 border-black'
+          } ${theme === 'high-contrast' ? 'text-base' : ''}`}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className={`font-bold text-xl flex items-center gap-2 ${
+                theme === 'dark' ? 'text-white' :
+                theme === 'light' ? 'text-blue-900' :
+                'text-black'
+              }`}>
+                📖 Инструкция по использованию
+              </h3>
+              <button
+                onClick={() => setShowInstruction(false)}
+                className={`p-2 rounded-lg cursor-pointer ${
+                  theme === 'dark' ? 'hover:bg-white/10 text-white' :
+                  theme === 'light' ? 'hover:bg-blue-100 text-blue-900' :
+                  'hover:bg-gray-200 text-black'
+                }`}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className={`space-y-6 ${
+              theme === 'dark' ? 'text-blue-100' :
+              theme === 'light' ? 'text-blue-800' :
+              'text-black'
+            } ${theme === 'high-contrast' ? 'text-lg leading-relaxed' : 'text-sm'}`}>
+              
+              <div>
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  🎯 Для чего нужно приложение?
+                </h4>
+                <p>
+                  Карьерный консультант PRO - это профессиональный инструмент для поиска вакансий в городах Приволжского федерального округа (ПФО). 
+                  Приложение интегрируется с популярными порталами по поиску работы (hh.ru, Работа России, Авито, SuperJob и др.) и позволяет 
+                  находить актуальные вакансии по вашим критериям.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  🚀 С чего начать?
+                </h4>
+                <ol className="list-decimal list-inside space-y-2 ml-2">
+                  <li>
+                    <strong>Введите ключевой запрос:</strong> в поле "Ключевые запросы" введите интересующую вас должность 
+                    (например: "начальник службы безопасности", "водитель", "менеджер")
+                  </li>
+                  <li>
+                    <strong>Добавьте запрос:</strong> нажмите кнопку "Добавить" или клавишу Enter. Вы можете добавить несколько запросов для расширения поиска.
+                  </li>
+                  <li>
+                    <strong>Выберите город:</strong> в выпадающем списке "Город" выберите интересующий вас город из 14 городов ПФО 
+                    (Чебоксары, Казань, Нижний Новгород и др.)
+                  </li>
+                  <li>
+                    <strong>Настройте фильтры (опционально):</strong>
+                    <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                      <li><strong>Зарплата:</strong> укажите желаемый диапазон зарплаты (от/до)</li>
+                      <li><strong>Тип занятости:</strong> выберите полную, частичную, удалённую работу, вахту или стажировку</li>
+                      <li><strong>Опыт работы:</strong> укажите ваш уровень опыта</li>
+                      <li><strong>Дата публикации:</strong> выберите дату, не ранее которой должны быть опубликованы вакансии</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong>Начните поиск:</strong> нажмите большую синюю кнопку "Начать поиск"
+                  </li>
+                </ol>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  📋 Что делать после поиска?
+                </h4>
+                <p className="mb-2">
+                  После завершения поиска автоматически откроется вкладка "Результаты", где вы увидите:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-2">
+                  <li>
+                    <strong>Список вакансий:</strong> сгруппированных по источникам (hh.ru, Работа России, Авито и др.)
+                  </li>
+                  <li>
+                    <strong>Карточки вакансий:</strong> с названием должности, компанией, зарплатой и ссылкой
+                  </li>
+                  <li>
+                    <strong>Кнопка ⭐:</strong> нажмите для добавления вакансии в избранное
+                  </li>
+                  <li>
+                    <strong>Кликабельные ссылки:</strong> нажмите на вакансию для перехода на сайт работодателя
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  💾 Как сохранить результаты?
+                </h4>
+                <p className="mb-2">В верхней части вкладки "Результаты" доступны три кнопки:</p>
+                <ul className="list-disc list-inside space-y-2 ml-2">
+                  <li>
+                    <strong>📥 Скачать PDF:</strong> создаёт PDF-документ со всеми найденными вакансиями на русском языке
+                  </li>
+                  <li>
+                    <strong>📊 Экспорт Excel:</strong> скачивает таблицу Excel с полной информацией о вакансиях
+                  </li>
+                  <li>
+                    <strong>📧 Отправить на email:</strong> открывает почтовый клиент с готовым письмом со списком вакансий
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  ⭐ Как работать с избранным?
+                </h4>
+                <p>
+                  Нажмите на вкладку "Избранное" чтобы увидеть все сохранённые вакансии. 
+                  Избранные вакансии сохраняются в браузере и остаются доступными даже после перезагрузки страницы.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  📊 Как использовать аналитику?
+                </h4>
+                <p>
+                  На вкладке "Аналитика" вы увидите:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-2">
+                  <li>Общее количество найденных вакансий</li>
+                  <li>Среднюю зарплату по результатам поиска</li>
+                  <li>Распределение вакансий по источникам</li>
+                  <li>Графики распределения зарплат</li>
+                  <li>Статистику по типам занятости</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  🎨 Как изменить тему оформления?
+                </h4>
+                <p>
+                  В панели табов есть кнопка переключения темы:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-2">
+                  <li><strong>☀️ Светлая тема:</strong> светлый фон, тёмный текст</li>
+                  <li><strong>🌙 Тёмная тема:</strong> тёмный фон, светлый текст (по умолчанию)</li>
+                  <li><strong>👁️ Для слабовидящих:</strong> высокий контраст, крупные шрифты</li>
+                </ul>
+                <p className="mt-2">Выбранная тема сохраняется автоматически.</p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  📱 Мобильная версия
+                </h4>
+                <p>
+                  Приложение полностью адаптировано для мобильных устройств. Все функции доступны на смартфонах и планшетах.
+                  Табы автоматически переносятся в две строки для удобства использования на маленьких экранах.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-lg mb-2 flex items-center gap-2">
+                  💡 Советы
+                </h4>
+                <ul className="list-disc list-inside space-y-2 ml-2">
+                  <li>Используйте несколько ключевых запросов для более широкого поиска</li>
+                  <li>Фильтр по зарплате помогает найти вакансии в вашем ценовом диапазоне</li>
+                  <li>Сохраняйте интересные вакансии в избранное для быстрого доступа</li>
+                  <li>Экспортируйте результаты в Excel для дальнейшего анализа</li>
+                  <li>Используйте аналитику для понимания рынка труда в вашем регионе</li>
+                </ul>
+              </div>
+
+              <div className={`p-4 rounded-lg ${
+                theme === 'dark' ? 'bg-blue-500/20 border border-blue-500/30' :
+                theme === 'light' ? 'bg-blue-100 border border-blue-300' :
+                'bg-yellow-200 border-2 border-black'
+              }`}>
+                <h4 className="font-bold mb-2">📞 Поддержка</h4>
+                <p>
+                  Если у вас возникли вопросы или проблемы с использованием приложения, 
+                  обратитесь в Кадровый центр "Работа России" Чувашской Республики:
+                </p>
+                <ul className="list-disc list-inside mt-2 space-y-1 ml-2">
+                  <li>
+                    <a href="https://czn.cap.ru/" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">
+                      https://czn.cap.ru/
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://vk.ru/czn_cheb" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">
+                      ВКонтакте: Кадровый центр
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowInstruction(false)}
+                className={`px-6 py-2 rounded-lg cursor-pointer font-medium ${
+                  theme === 'high-contrast' ? 'bg-yellow-400 text-black hover:bg-yellow-500' :
+                  'bg-blue-600 hover:bg-blue-500 text-white'
+                }`}
+              >
+                Понятно, закрыть
               </button>
             </div>
           </div>
