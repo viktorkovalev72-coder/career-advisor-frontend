@@ -1,14 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Vacancy, SearchFilters } from './types-pro';
-import { searchAll, generateExternalLinks, checkServerHealth } from './services/api-pro';
+import { searchAll, generateExternalLinks } from './services/api-pro';
 import { CITIES, EMPLOYMENT_TYPES, EXPERIENCE_LEVELS } from './services/cities';
 import { generatePDF } from './services/pdfGenerator-pro';
 import { exportToExcel } from './services/excelExport';
 import { calculateAnalytics } from './services/analytics';
 import { getFavorites, toggleFavorite, isFavorite } from './services/favorites';
-import { requestNotificationPermission, notifySearchComplete } from './services/notifications';
 import { openMailClient } from './services/emailService';
-import { checkSpelling, getSmartSuggestions } from './services/smartSearch';
 import { addSearchToStats, addExportToStats } from './services/statistics';
 import AdminPanel from './components/AdminPanel';
 import {
@@ -21,7 +19,6 @@ export default function AppPro() {
   // Состояние фильтров
   const [keywords, setKeywords] = useState<string[]>([]);
   const [newKeyword, setNewKeyword] = useState('');
-  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState<string[]>([]);
   const [selectedCity, setSelectedCity] = useState(CITIES[0]);
   const [salaryFrom, setSalaryFrom] = useState<number | undefined>();
   const [salaryTo, setSalaryTo] = useState<number | undefined>();
@@ -69,6 +66,9 @@ export default function AppPro() {
 
   // Поиск
   const performSearch = useCallback(async () => {
+    console.log('[AppPro] performSearch вызвана');
+    console.log('[AppPro] Ключевые слова:', keywords);
+    
     if (keywords.length === 0) {
       alert('Добавьте хотя бы один ключевой запрос!');
       return;
@@ -77,21 +77,6 @@ export default function AppPro() {
     setIsSearching(true);
     setSearchComplete(false);
     setVacancies([]);
-
-// Сохраняем статистику поиска на сервере
-addSearchToStats({
-  keywords: filters.keywords,
-  city: selectedCity.name,
-  cityId: selectedCity.hhId,
-  salaryFrom,
-  salaryTo,
-  employment: selectedEmployment,
-  experience: selectedExperience,
-  resultsCount: unique.length,
-}).catch(err => console.error('Error saving search stats:', err));
-    
-    // Запрашиваем разрешение на уведомления
-    await requestNotificationPermission();
 
     const filters: SearchFilters = {
       keywords,
@@ -107,25 +92,21 @@ addSearchToStats({
 
     let allVacancies: Vacancy[] = [];
 
-    // Проверка работоспособности сервера
-    const serverOk = await checkServerHealth();
-    if (!serverOk) {
-      alert('⚠️ Сервер недоступен!\n\nЗапустите сервер командой:\ncd server\nnpm install\nnpm run dev\n\nИли используйте только внешние ссылки.');
-    }
-
     // Комплексный поиск через сервер
     try {
+      console.log('[AppPro] Отправка запроса на сервер...');
       const searchResults = await searchAll(filters);
       allVacancies.push(...searchResults);
       console.log(`[AppPro] Найдено через сервер: ${searchResults.length} вакансий`);
     } catch (e) {
-      console.error('Search error:', e);
-      alert('Ошибка поиска: ' + (e as Error).message);
+      console.error('[AppPro] Search error:', e);
+      // Не показываем alert, просто логируем ошибку
     }
 
     // Внешние ссылки
     const extLinks = generateExternalLinks(filters);
     allVacancies.push(...extLinks);
+    console.log(`[AppPro] Добавлено внешних ссылок: ${extLinks.length}`);
 
     // Дедупликация
     const seen = new Map<string, Vacancy>();
@@ -135,12 +116,14 @@ addSearchToStats({
     });
 
     const unique = Array.from(seen.values());
+    console.log(`[AppPro] Уникальных вакансий: ${unique.length}`);
+    
     setVacancies(unique);
     setIsSearching(false);
     setSearchComplete(true);
     setActiveTab('results');
 
-    // Сохраняем статистику поиска
+    // Сохраняем статистику поиска на сервере (не блокируем выполнение)
     addSearchToStats({
       keywords: filters.keywords,
       city: selectedCity.name,
@@ -150,10 +133,7 @@ addSearchToStats({
       employment: selectedEmployment,
       experience: selectedExperience,
       resultsCount: unique.length,
-    });
-
-    // Уведомление
-    notifySearchComplete(unique.length);
+    }).catch(err => console.error('Error saving search stats:', err));
   }, [keywords, selectedCity, salaryFrom, salaryTo, dateFrom, selectedEmployment, selectedExperience]);
 
   // Избранное
@@ -177,14 +157,12 @@ addSearchToStats({
     };
     generatePDF(vacancies, filters);
     addExportToStats('pdf').catch(err => console.error('Error saving export stats:', err));
-    addExportToStats('pdf');
   };
 
   // Экспорт в Excel
   const handleExportExcel = () => {
     exportToExcel(vacancies, 'vacancies_pro');
     addExportToStats('excel').catch(err => console.error('Error saving export stats:', err));
-    addExportToStats('excel');
   };
 
   // Отправка на email
@@ -195,7 +173,6 @@ addSearchToStats({
     }
     openMailClient(email, vacancies, selectedCity.name);
     addExportToStats('email').catch(err => console.error('Error saving export stats:', err));
-    addExportToStats('email');
     setShowEmailModal(false);
   };
 
@@ -343,34 +320,15 @@ addSearchToStats({
                   <input
                     type="text"
                     value={newKeyword}
-                    onChange={async (e) => {
-                      const value = e.target.value;
-                      setNewKeyword(value);
-                      // Получаем подсказки при вводе
-                      if (value.length >= 2) {
-                        const suggestions = await getSmartSuggestions(value);
-                        setAutocompleteSuggestions(suggestions);
-                      } else {
-                        setAutocompleteSuggestions([]);
-                      }
+                    onChange={(e) => {
+                      setNewKeyword(e.target.value);
                     }}
-                    onKeyDown={async (e) => {
+                    onKeyDown={(e) => {
                       if (e.key === 'Enter' && newKeyword.trim()) {
-                        // Проверяем орфографию перед добавлением
-                        const corrected = await checkSpelling(newKeyword.trim());
-                        if (corrected !== newKeyword.trim()) {
-                          if (confirm(`Возможно, вы имели в виду "${corrected}"?\n\nДобавить исправленный вариант?`)) {
-                            setKeywords([...keywords, corrected]);
-                            setNewKeyword('');
-                          } else {
-                            setKeywords([...keywords, newKeyword.trim()]);
-                            setNewKeyword('');
-                          }
-                        } else {
+                        if (!keywords.includes(newKeyword.trim())) {
                           setKeywords([...keywords, newKeyword.trim()]);
                           setNewKeyword('');
                         }
-                        setAutocompleteSuggestions([]);
                       }
                     }}
                     placeholder="Введите должность (например: начальник службы безопасности)"
@@ -380,52 +338,13 @@ addSearchToStats({
                       'bg-white border-2 border-black text-black placeholder-gray-500 focus:border-yellow-500'
                     }`}
                   />
-                  
-                  {/* Выпадающий список подсказок */}
-                  {autocompleteSuggestions.length > 0 && (
-                    <div className={`absolute top-full left-0 right-0 mt-1 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto ${
-                      theme === 'dark' ? 'bg-slate-800 border border-white/20' :
-                      theme === 'light' ? 'bg-white border border-blue-200' :
-                      'bg-yellow-50 border-2 border-black'
-                    }`}>
-                      {autocompleteSuggestions.map((suggestion, i) => (
-                        <button
-                          key={i}
-                          onClick={() => {
-                            setNewKeyword(suggestion);
-                            setAutocompleteSuggestions([]);
-                          }}
-                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                            theme === 'dark' ? 'text-white hover:bg-white/10' :
-                            theme === 'light' ? 'text-blue-900 hover:bg-blue-50' :
-                            'text-black hover:bg-yellow-100'
-                          }`}
-                        >
-                          {suggestion}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
                 
                 <button
-                  onClick={async () => {
-                    if (newKeyword.trim()) {
-                      // Проверяем орфографию перед добавлением
-                      const corrected = await checkSpelling(newKeyword.trim());
-                      if (corrected !== newKeyword.trim()) {
-                        if (confirm(`Возможно, вы имели в виду "${corrected}"?\n\nДобавить исправленный вариант?`)) {
-                          setKeywords([...keywords, corrected]);
-                          setNewKeyword('');
-                        } else {
-                          setKeywords([...keywords, newKeyword.trim()]);
-                          setNewKeyword('');
-                        }
-                      } else {
-                        setKeywords([...keywords, newKeyword.trim()]);
-                        setNewKeyword('');
-                      }
-                      setAutocompleteSuggestions([]);
+                  onClick={() => {
+                    if (newKeyword.trim() && !keywords.includes(newKeyword.trim())) {
+                      setKeywords([...keywords, newKeyword.trim()]);
+                      setNewKeyword('');
                     }
                   }}
                   className={`px-4 py-2 rounded-lg flex items-center justify-center gap-1 cursor-pointer text-sm font-medium ${
