@@ -11,6 +11,7 @@ export interface SearchStats {
   experience: string[];
   resultsCount: number;
   exportedTo?: 'pdf' | 'excel' | 'email';
+  userId?: string;
 }
 
 export interface AppStatistics {
@@ -22,84 +23,65 @@ export interface AppStatistics {
   employmentRating: Record<string, number>;
   experienceRating: Record<string, number>;
   dailyStats: Record<string, number>;
+  uniqueUsers: string[];
+  topKeywords: Array<{ keyword: string; count: number }>;
+  topCities: Array<{ city: string; count: number }>;
 }
 
-const STORAGE_KEY = 'career-advisor-statistics';
+// URL сервера для статистики
+const API_URL = 'https://career-advisor-prsj.onrender.com';
 const ADMIN_PASSWORD = 'admin2024'; // Измените на свой пароль!
 
-// Получить статистику из localStorage
-export function getStatistics(): AppStatistics {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (!data) {
-    return {
-      totalSearches: 0,
-      totalExports: 0,
-      searches: [],
-      keywordRating: {},
-      cityRating: {},
-      employmentRating: {},
-      experienceRating: {},
-      dailyStats: {},
-    };
+// Получить статистику с сервера (только для админа)
+export async function getStatistics(): Promise<AppStatistics | null> {
+  try {
+    const response = await fetch(`${API_URL}/api/stats`, {
+      headers: {
+        'x-admin-password': ADMIN_PASSWORD,
+      },
+    });
+    
+    if (!response.ok) {
+      console.error('Error fetching statistics:', response.statusText);
+      return null;
+    }
+    
+    const data = await response.json();
+    return data.data;
+  } catch (error) {
+    console.error('Error fetching statistics:', error);
+    return null;
   }
-  return JSON.parse(data);
 }
 
-// Сохранить статистику в localStorage
-export function saveStatistics(stats: AppStatistics): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
-}
-
-// Добавить новый поиск в статистику
-export function addSearchToStats(search: Omit<SearchStats, 'id' | 'timestamp'>): void {
-  const stats = getStatistics();
-  
-  const newSearch: SearchStats = {
-    ...search,
-    id: Date.now().toString(),
-    timestamp: new Date().toISOString(),
-  };
-  
-  stats.searches.push(newSearch);
-  stats.totalSearches++;
-  
-  // Обновить рейтинг ключевых слов
-  search.keywords.forEach(keyword => {
-    stats.keywordRating[keyword] = (stats.keywordRating[keyword] || 0) + 1;
-  });
-  
-  // Обновить рейтинг городов
-  stats.cityRating[search.city] = (stats.cityRating[search.city] || 0) + 1;
-  
-  // Обновить рейтинг типа занятости
-  search.employment.forEach(emp => {
-    stats.employmentRating[emp] = (stats.employmentRating[emp] || 0) + 1;
-  });
-  
-  // Обновить рейтинг опыта
-  search.experience.forEach(exp => {
-    stats.experienceRating[exp] = (stats.experienceRating[exp] || 0) + 1;
-  });
-  
-  // Обновить дневную статистику
-  const today = new Date().toISOString().split('T')[0];
-  stats.dailyStats[today] = (stats.dailyStats[today] || 0) + 1;
-  
-  saveStatistics(stats);
-}
-
-// Добавить экспорт в статистику
-export function addExportToStats(type: 'pdf' | 'excel' | 'email'): void {
-  const stats = getStatistics();
-  stats.totalExports++;
-  
-  // Обновить последний поиск
-  if (stats.searches.length > 0) {
-    const lastSearch = stats.searches[stats.searches.length - 1];
-    lastSearch.exportedTo = type;
+// Добавить новый поиск в статистику на сервере
+export async function addSearchToStats(search: Omit<SearchStats, 'id' | 'timestamp' | 'userId'>): Promise<void> {
+  try {
+    await fetch(`${API_URL}/api/stats/search`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(search),
+    });
+  } catch (error) {
+    console.error('Error adding search to stats:', error);
   }
-  
-  saveStatistics(stats);
+}
+
+// Добавить экспорт в статистику на сервере
+export async function addExportToStats(type: 'pdf' | 'excel' | 'email'): Promise<void> {
+  try {
+    await fetch(`${API_URL}/api/stats/export`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type }),
+    });
+  } catch (error) {
+    console.error('Error adding export to stats:', error);
+  }
 }
 
 // Проверка пароля администратора
@@ -107,46 +89,58 @@ export function checkAdminPassword(password: string): boolean {
   return password === ADMIN_PASSWORD;
 }
 
-// Очистить всю статистику
-export function clearStatistics(): void {
-  localStorage.removeItem(STORAGE_KEY);
+// Очистить всю статистику на сервере (только для админа)
+export async function clearStatistics(): Promise<boolean> {
+  try {
+    const response = await fetch(`${API_URL}/api/stats`, {
+      method: 'DELETE',
+      headers: {
+        'x-admin-password': ADMIN_PASSWORD,
+      },
+    });
+    return response.ok;
+  } catch (error) {
+    console.error('Error clearing statistics:', error);
+    return false;
+  }
 }
 
-// Получить топ N ключевых слов
-export function getTopKeywords(n: number = 10): Array<{ keyword: string; count: number }> {
-  const stats = getStatistics();
-  return Object.entries(stats.keywordRating)
-    .map(([keyword, count]) => ({ keyword, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, n);
+// Экспорт статистики в JSON с сервера (только для админа)
+export async function exportStatisticsToJSON(): Promise<string | null> {
+  try {
+    const response = await fetch(`${API_URL}/api/stats/export/json`, {
+      headers: {
+        'x-admin-password': ADMIN_PASSWORD,
+      },
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    return await response.text();
+  } catch (error) {
+    console.error('Error exporting statistics to JSON:', error);
+    return null;
+  }
 }
 
-// Получить топ N городов
-export function getTopCities(n: number = 10): Array<{ city: string; count: number }> {
-  const stats = getStatistics();
-  return Object.entries(stats.cityRating)
-    .map(([city, count]) => ({ city, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, n);
-}
-
-// Экспорт статистики в JSON
-export function exportStatisticsToJSON(): string {
-  const stats = getStatistics();
-  return JSON.stringify(stats, null, 2);
-}
-
-// Экспорт статистики в CSV
-export function exportStatisticsToCSV(): string {
-  const stats = getStatistics();
-  
-  let csv = 'Дата,Ключевые слова,Город,Результатов,Экспорт\n';
-  
-  stats.searches.forEach(search => {
-    const date = new Date(search.timestamp).toLocaleString('ru-RU');
-    const keywords = search.keywords.join('; ');
-    csv += `${date},"${keywords}",${search.city},${search.resultsCount},${search.exportedTo || '-'}\n`;
-  });
-  
-  return csv;
+// Экспорт статистики в CSV с сервера (только для админа)
+export async function exportStatisticsToCSV(): Promise<string | null> {
+  try {
+    const response = await fetch(`${API_URL}/api/stats/export/csv`, {
+      headers: {
+        'x-admin-password': ADMIN_PASSWORD,
+      },
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    return await response.text();
+  } catch (error) {
+    console.error('Error exporting statistics to CSV:', error);
+    return null;
+  }
 }
