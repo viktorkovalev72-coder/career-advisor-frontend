@@ -78,6 +78,18 @@ export default function AppPro() {
     setSearchComplete(false);
     setVacancies([]);
 
+// Сохраняем статистику поиска на сервере
+addSearchToStats({
+  keywords: filters.keywords,
+  city: selectedCity.name,
+  cityId: selectedCity.hhId,
+  salaryFrom,
+  salaryTo,
+  employment: selectedEmployment,
+  experience: selectedExperience,
+  resultsCount: unique.length,
+}).catch(err => console.error('Error saving search stats:', err));
+    
     // Запрашиваем разрешение на уведомления
     await requestNotificationPermission();
 
@@ -164,12 +176,14 @@ export default function AppPro() {
       experience: selectedExperience,
     };
     generatePDF(vacancies, filters);
+    addExportToStats('pdf').catch(err => console.error('Error saving export stats:', err));
     addExportToStats('pdf');
   };
 
   // Экспорт в Excel
   const handleExportExcel = () => {
     exportToExcel(vacancies, 'vacancies_pro');
+    addExportToStats('excel').catch(err => console.error('Error saving export stats:', err));
     addExportToStats('excel');
   };
 
@@ -180,6 +194,7 @@ export default function AppPro() {
       return;
     }
     openMailClient(email, vacancies, selectedCity.name);
+    addExportToStats('email').catch(err => console.error('Error saving export stats:', err));
     addExportToStats('email');
     setShowEmailModal(false);
   };
