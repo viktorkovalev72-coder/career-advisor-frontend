@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
   getStatistics,
-  getTopKeywords,
-  getTopCities,
   clearStatistics,
   exportStatisticsToJSON,
   exportStatisticsToCSV,
@@ -34,7 +32,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
 
   useEffect(() => {
     if (isAuthenticated) {
-      setStats(getStatistics());
+      getStatistics().then(setStats);
     }
   }, [isAuthenticated]);
 
@@ -47,15 +45,18 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
     }
   };
 
-  const handleClearStats = () => {
+  const handleClearStats = async () => {
     if (confirm('Вы уверены, что хотите удалить всю статистику? Это действие нельзя отменить.')) {
-      clearStatistics();
-      setStats(getStatistics());
+      await clearStatistics();
+      const newStats = await getStatistics();
+      setStats(newStats);
     }
   };
 
-  const handleExportJSON = () => {
-    const json = exportStatisticsToJSON();
+  const handleExportJSON = async () => {
+    const json = await exportStatisticsToJSON();
+    if (!json) return;
+    
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -65,8 +66,10 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
     URL.revokeObjectURL(url);
   };
 
-  const handleExportCSV = () => {
-    const csv = exportStatisticsToCSV();
+  const handleExportCSV = async () => {
+    const csv = await exportStatisticsToCSV();
+    if (!csv) return;
+    
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -130,8 +133,8 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   // Админ-панель
   if (!stats) return null;
 
-  const topKeywords = getTopKeywords(10);
-  const topCities = getTopCities(10);
+  const topKeywords = stats.topKeywords || [];
+  const topCities = stats.topCities || [];
 
   return (
     <div className="fixed inset-0 bg-slate-900 z-50 overflow-y-auto">
@@ -218,7 +221,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
           </h3>
           {topKeywords.length > 0 ? (
             <div className="space-y-2">
-              {topKeywords.map((item, i) => (
+              {topKeywords.map((item: { keyword: string; count: number }, i: number) => (
                 <div key={i} className="flex items-center gap-3">
                   <span className="text-blue-200 text-sm w-8">{i + 1}.</span>
                   <span className="text-white text-sm flex-1">{item.keyword}</span>
@@ -247,7 +250,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
           </h3>
           {topCities.length > 0 ? (
             <div className="space-y-2">
-              {topCities.map((item, i) => (
+              {topCities.map((item: { city: string; count: number }, i: number) => (
                 <div key={i} className="flex items-center gap-3">
                   <span className="text-blue-200 text-sm w-8">{i + 1}.</span>
                   <span className="text-white text-sm flex-1">{item.city}</span>
