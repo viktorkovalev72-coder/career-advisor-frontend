@@ -30,7 +30,7 @@ export interface AppStatistics {
 
 // URL сервера для статистики
 const API_URL = 'https://career-advisor-prsj.onrender.com';
-const ADMIN_PASSWORD = 'admin2024'; // Измените на свой пароль!
+const ADMIN_PASSWORD = '1Qaz2Wsx'; // Измените на свой пароль!
 
 // Получить статистику с сервера (только для админа)
 export async function getStatistics(): Promise<AppStatistics | null> {
