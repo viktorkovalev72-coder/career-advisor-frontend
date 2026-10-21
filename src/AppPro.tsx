@@ -9,6 +9,8 @@ import { getFavorites, toggleFavorite, isFavorite } from './services/favorites';
 import { requestNotificationPermission, notifySearchComplete } from './services/notifications';
 import { openMailClient } from './services/emailService';
 import { checkSpelling, getSmartSuggestions } from './services/smartSearch';
+import { addSearchToStats, addExportToStats } from './services/statistics';
+import AdminPanel from './components/AdminPanel';
 import {
   Shield, Search, FileText, ExternalLink, Briefcase, MapPin,
   Loader2, CheckCircle, AlertCircle, Download, Table, Mail,
@@ -46,6 +48,9 @@ export default function AppPro() {
 
   // Инструкция
   const [showInstruction, setShowInstruction] = useState(false);
+
+  // Админ-панель
+  const [showAdmin, setShowAdmin] = useState(false);
 
   // Применение темы
   useEffect(() => {
@@ -123,6 +128,18 @@ export default function AppPro() {
     setSearchComplete(true);
     setActiveTab('results');
 
+    // Сохраняем статистику поиска
+    addSearchToStats({
+      keywords: filters.keywords,
+      city: selectedCity.name,
+      cityId: selectedCity.hhId,
+      salaryFrom,
+      salaryTo,
+      employment: selectedEmployment,
+      experience: selectedExperience,
+      resultsCount: unique.length,
+    });
+
     // Уведомление
     notifySearchComplete(unique.length);
   }, [keywords, selectedCity, salaryFrom, salaryTo, dateFrom, selectedEmployment, selectedExperience]);
@@ -147,11 +164,13 @@ export default function AppPro() {
       experience: selectedExperience,
     };
     generatePDF(vacancies, filters);
+    addExportToStats('pdf');
   };
 
   // Экспорт в Excel
   const handleExportExcel = () => {
     exportToExcel(vacancies, 'vacancies_pro');
+    addExportToStats('excel');
   };
 
   // Отправка на email
@@ -161,6 +180,7 @@ export default function AppPro() {
       return;
     }
     openMailClient(email, vacancies, selectedCity.name);
+    addExportToStats('email');
     setShowEmailModal(false);
   };
 
@@ -1404,6 +1424,21 @@ export default function AppPro() {
           </div>
         </div>
       )}
+
+      {/* Кнопка админ-панели */}
+      <button
+        onClick={() => setShowAdmin(true)}
+        className={`fixed bottom-4 right-4 w-14 h-14 rounded-full shadow-lg cursor-pointer flex items-center justify-center z-40 transition-all hover:scale-110 ${
+          theme === 'high-contrast' ? 'bg-yellow-400 text-black hover:bg-yellow-500' :
+          'bg-gradient-to-br from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600'
+        }`}
+        title="Админ-панель"
+      >
+        <Shield className="w-7 h-7" />
+      </button>
+
+      {/* Админ-панель */}
+      {showAdmin && <AdminPanel onClose={() => setShowAdmin(false)} />}
     </div>
   );
 }
